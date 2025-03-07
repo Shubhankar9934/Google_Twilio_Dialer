@@ -1,0 +1,86 @@
+graph TB
+    subgraph User Interface Layer
+        UI[Web Interface]
+        WS[WebSocket Client]
+    end
+
+    subgraph Application Layer
+        FA[Flask Application]
+        WSM[WebSocket Manager]
+        subgraph Call Management
+            CM[Call Manager]
+            TMH[Twilio Media Handler]
+            CH[Client Handler]
+        end
+    end
+
+    subgraph Service Layer
+        subgraph Twilio Integration
+            TS[Twilio Service]
+            TMS[Media Streaming]
+            TC[Call Control]
+        end
+        
+        subgraph Speech Processing
+            DS[Deepgram Service]
+            subgraph Audio Processing
+                IS[Inbound Service]
+                OS[Outbound Service]
+            end
+        end
+    end
+
+    subgraph External APIs
+        TAPI[Twilio API]
+        DAPI[Deepgram API]
+    end
+
+    %% User Interface Connections
+    UI -->|HTTP/WS| FA
+    WS -->|WebSocket| WSM
+
+    %% Application Layer Connections
+    FA -->|Manage| WSM
+    WSM -->|Handle| CM
+    CM -->|Route| TMH
+    CM -->|Update| CH
+
+    %% Service Layer Connections
+    TMH -->|Stream| IS
+    TMH -->|Stream| OS
+    IS -->|Process| DS
+    OS -->|Process| DS
+
+    %% External API Connections
+    TS -->|API Calls| TAPI
+    DS -->|WebSocket| DAPI
+
+    %% Data Flow
+    TAPI -->|Media Stream| TMS
+    TMS -->|Audio| TMH
+    DAPI -->|Transcription| DS
+    DS -->|Results| WSM
+    WSM -->|Updates| WS
+    WS -->|Display| UI
+
+    %% Styling
+    classDef interface fill:#f9f,stroke:#333,stroke-width:2px
+    classDef application fill:#bbf,stroke:#333,stroke-width:2px
+    classDef service fill:#bfb,stroke:#333,stroke-width:2px
+    classDef external fill:#fbb,stroke:#333,stroke-width:2px
+
+    class UI,WS interface
+    class FA,WSM,CM,TMH,CH application
+    class TS,TMS,TC,DS,IS,OS service
+    class TAPI,DAPI external
+
+%% Flow Description:
+%% 1. User initiates call through Web Interface
+%% 2. Flask Application processes request and manages WebSocket connections
+%% 3. WebSocket Manager coordinates between Twilio Media and Client Handlers
+%% 4. Twilio Service handles call setup and media streaming
+%% 5. Audio streams are processed through Inbound/Outbound Services
+%% 6. Deepgram Service performs real-time transcription
+%% 7. Results are routed back through WebSocket Manager
+%% 8. Client receives updates via WebSocket connection
+%% 9. Web Interface displays real-time transcription and call status
