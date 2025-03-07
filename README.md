@@ -158,4 +158,4 @@ Additional steps for production:
 
 
 
-set GOOGLE_APPLICATION_CREDENTIALS=C:\Users\shubh\Desktop\Google_STT_Dialer\Dialer\call-analyzer-452421-efc670a5af68.json
+
